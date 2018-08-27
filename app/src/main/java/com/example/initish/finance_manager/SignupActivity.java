@@ -1,6 +1,9 @@
 package com.example.initish.finance_manager;
 
+import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -10,19 +13,34 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApi;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
-public class SignupActivity extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity implements View.OnClickListener{
 
     ProgressBar progressbar;
     EditText actusr,actmail,actpass;
 
     private FirebaseAuth mAuth;
+    FirebaseAuth.AuthStateListener mAuthListener;
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +51,7 @@ public class SignupActivity extends AppCompatActivity {
         actusr=(EditText) findViewById(R.id.actusr);
         progressbar=(ProgressBar) findViewById(R.id.progressbar);
         Button btn= (Button) findViewById(R.id.actsignup);
-        btn.setOnClickListener(onClickListener);
-
+        btn.setOnClickListener(this);
         mAuth = FirebaseAuth.getInstance();
     }
 
@@ -92,12 +109,13 @@ public class SignupActivity extends AppCompatActivity {
 
     }
 
-    View.OnClickListener onClickListener= new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            registerUser();
+    @Override
+    public void onClick(View view) {
+        switch (view.getId())
+        {
+            case R.id.actsignup:
+                registerUser();
         }
-    };
-
+    }
 
 }
