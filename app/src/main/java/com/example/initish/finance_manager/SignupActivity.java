@@ -37,12 +37,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
@@ -94,6 +88,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 progressbar.setVisibility(View.GONE);
                 if(task.isSuccessful()){
                     Toast.makeText(getApplicationContext(),"User registered Successfully", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getApplicationContext(),Main2Activity.class));
                 }
                 else{
                     if(task.getException() instanceof FirebaseAuthUserCollisionException){
