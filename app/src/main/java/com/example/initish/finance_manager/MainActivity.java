@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,8 +36,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private static final String TAG = "";
     SignInButton button;
-    Button signup;
-    Button signin;
+    Button signup,signin;
     private static final int RC_SIGN_IN = 2;
     GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
@@ -51,10 +51,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         button = (SignInButton) findViewById(R.id.button);
-        button.setOnClickListener(this);
         signup = (Button) findViewById(R.id.signup);
         signin=(Button) findViewById(R.id.signin);
+        button.setOnClickListener(this);
         signup.setOnClickListener(this);
+        signin.setOnClickListener(this);
 
 
         if (mFirebaseAuth.getCurrentUser() != null) {
@@ -149,54 +150,49 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         String email = username.getText().toString().trim();
 
         String password = passwd.getText().toString().trim();
-
-        String ready= "true";
-        if (TextUtils.isEmpty(email)){
-
-            //email is empty
-            username.setError(getString(R.string.error_field_required));
-            ready = "false";
-
-        }else if (!isEmailValid(email)) {
-            passwd.setError(getString(R.string.error_invalid_email));
-            ready = "false";
+        if(email.isEmpty()){
+            username.setError("E mail is required");
+            username.requestFocus();
+            return;
         }
-
-        if (TextUtils.isEmpty(password)){
-
-            //password is empty
-            passwd.setError(getString(R.string.error_field_required));
-            ready = "false";
-
+        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            username.setError("E mail is required");
+            username.requestFocus();
+            return;
         }
-        //if validations are ok
-        if(ready.equals("true")) {
-            progressDialog.setMessage("Logging in...");
-            progressDialog.show();
-
-            mFirebaseAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-
-                            progressDialog.dismiss();
-                            if (task.isSuccessful()) {
-
-                                Log.d("pass", "signInWithEmail:success");
-                                startActivity(new Intent(getApplicationContext(),Main2Activity.class));
-                                finish();
-
-                            } else {
-
-                                Log.w("fail", "signInWithEmail:failure", task.getException());
-
-                            }
-
-                        }
-                    });
+        if(password.isEmpty()){
+            passwd.setError("Password is required");
+            passwd.requestFocus();
+            return;
         }
+        if(password.length()<6){
+            passwd.setError("Minimum length of Password is 6");
+            passwd.requestFocus();
+            return;
+        }
+        progressDialog.setMessage("Logging in...");
+        progressDialog.show();
+
+     mFirebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+         @Override
+         public void onComplete(@NonNull Task<AuthResult> task) {
+             if(task.isSuccessful()){
+                progressDialog.dismiss();
+                 Intent intent=new Intent(MainActivity.this,Main2Activity.class);
+                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                 startActivity(intent);
+             }
+             else{
+                 progressDialog.dismiss();
+                 Toast.makeText(getApplicationContext(),task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+             }
+
+         }
+     });
+
 
     }
+
     private void updateUI(FirebaseUser user) {
     }
 
