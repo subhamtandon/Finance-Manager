@@ -107,10 +107,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
+                startActivity(new Intent(getApplicationContext(), Main2Activity.class));
             } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
+
                 Log.w(TAG, "Google sign in failed", e);
-                // ...
+                Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -129,13 +130,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
                             Log.d("info", "signInWithCredential:success");
                             finish();
                             FirebaseUser user = mFirebaseAuth.getCurrentUser();
                             startActivity(new Intent(getApplicationContext(), Main2Activity.class));
                         } else {
                             // If sign in fails, display a message to the user.
+                            progressDialog.dismiss();
                             Log.w("info", "signInWithCredential:failure", task.getException());
                             Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
                         }
